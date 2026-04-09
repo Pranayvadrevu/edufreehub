@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson - EduFreeHub</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --success: #06d6a0;
+            --danger: #ef476f;
+            --dark: #1b263b;
+            --light: #f8f9fa;
+            --text: #2b2d42;
+            --bg: #ffffff;
+            --sidebar-width: 320px;
+            --topbar-height: 60px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+        body { background:var(--bg); color:var(--text); line-height:1.7; display:flex; height:100vh; overflow:hidden; }
+
+        /* Topbar */
+        .topbar { position:fixed; top:0; left:0; right:0; height:var(--topbar-height); background:var(--dark); color:white; display:flex; align-items:center; justify-content:space-between; padding:0 1.5rem; z-index:100; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+        .branding a { color:white; text-decoration:none; font-weight:bold; font-size:1.2rem; display:flex; align-items:center; gap:0.5rem; }
+        .branding a span { color:var(--accent); }
+        .back-link { display:flex; align-items:center; gap:0.4rem; color:var(--light); opacity:0.8; text-decoration:none; font-size:0.9rem; transition:opacity 0.2s; }
+        .back-link:hover { opacity:1; }
+
+        /* Sidebar ToC */
+        .sidebar { width:var(--sidebar-width); height:calc(100vh - var(--topbar-height)); margin-top:var(--topbar-height); background:var(--light); border-right:1px solid rgba(0,0,0,0.08); overflow-y:auto; flex-shrink:0; }
+        .course-title-sidebar { padding:1.5rem 1.5rem 1rem; font-weight:bold; font-size:1.1rem; border-bottom:1px solid rgba(0,0,0,0.05); }
+        .toc-module { border-bottom:1px solid rgba(0,0,0,0.04); }
+        .toc-module-header { padding:1rem 1.5rem; font-weight:600; font-size:0.95rem; cursor:pointer; display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.02); }
+        .toc-topic { padding:0.8rem 1.5rem 0.8rem 2.5rem; font-size:0.85rem; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:0.6rem; border-left:3px solid transparent; transition:all 0.2s; cursor:pointer; }
+        .toc-topic:hover { background:white; }
+        .toc-topic.active { background:white; border-left-color:var(--primary); font-weight:600; color:var(--primary); }
+        .toc-icon { width:16px; height:16px; border:2px solid rgba(0,0,0,0.2); border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+        .toc-topic.completed .toc-icon { background:var(--success); border-color:var(--success); }
+        .toc-topic.completed .toc-icon::after { content:''; width:4px; height:8px; border:solid white; border-width:0 2px 2px 0; transform:rotate(45deg); margin-bottom:2px; }
+
+        /* Main Content */
+        .main-wrapper { flex:1; height:calc(100vh - var(--topbar-height)); margin-top:var(--topbar-height); overflow-y:auto; background:white; position:relative; scroll-behavior:smooth; }
+        .content-container { max-width:800px; margin:0 auto; padding:4rem 2rem 8rem; }
+        
+        .lesson-header { margin-bottom:2.5rem; }
+        .module-label { font-size:0.85rem; color:var(--primary); font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:0.5rem; }
+        .lesson-title { font-size:2.4rem; color:var(--dark); line-height:1.2; margin-bottom:1rem; }
+        
+        .lesson-body { font-size:1.05rem; color:#3a3c4c; }
+        .lesson-body h3 { font-size:1.5rem; color:var(--dark); margin:2rem 0 1rem; }
+        .lesson-body p { margin-bottom:1.2rem; }
+        .lesson-body ul { margin-bottom:1.2rem; padding-left:1.5rem; }
+        .lesson-body li { margin-bottom:0.5rem; }
+        
+        /* Video Placeholder */
+        .video-container { position:relative; width:100%; padding-bottom:56.25%; background:#000; border-radius:8px; overflow:hidden; margin:2rem 0; box-shadow:0 10px 25px rgba(0,0,0,0.1); }
+        .video-placeholder { position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, var(--dark), var(--secondary)); color:white; }
+        .play-btn { width:60px; height:60px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-bottom:1rem; transition:transform 0.2s; }
+        .play-btn:hover { transform:scale(1.1); }
+        .play-btn svg { width:24px; height:24px; fill:white; margin-left:4px; }
+
+        /* Quiz Box */
+        .quiz-section { margin-top:4rem; padding:2.5rem; background:var(--light); border-radius:12px; border:1px solid rgba(0,0,0,0.06); }
+        .quiz-title { font-size:1.4rem; margin-bottom:0.5rem; color:var(--dark); }
+        .quiz-subtitle { font-size:0.9rem; opacity:0.7; margin-bottom:2rem; }
+        
+        .question-block { margin-bottom:2rem; }
+        .question-text { font-weight:600; margin-bottom:1rem; font-size:1.1rem; }
+        .options { display:flex; flex-direction:column; gap:0.8rem; }
+        .option-label { display:flex; align-items:center; gap:0.8rem; padding:1rem; background:white; border:2px solid transparent; border-radius:8px; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 5px rgba(0,0,0,0.02); }
+        .option-label:hover { border-color:rgba(67,97,238,0.3); }
+        .option-label input { width:18px; height:18px; accent-color:var(--primary); cursor:pointer; }
+        .option-label.correct { border-color:var(--success); background:rgba(6,214,160,0.05); }
+        .option-label.wrong { border-color:var(--danger); background:rgba(239,71,111,0.05); }
+
+        .submit-btn { padding:1rem 2rem; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:600; font-size:1.05rem; cursor:pointer; width:100%; transition:background 0.2s; }
+        .submit-btn:hover { background:var(--secondary); }
+        .submit-btn:disabled { background:#ccc; cursor:not-allowed; }
+
+        /* Bottom Nav */
+        .lesson-nav { display:flex; justify-content:space-between; margin-top:4rem; padding-top:2rem; border-top:1px solid rgba(0,0,0,0.08); }
+        .nav-btn { padding:0.8rem 1.5rem; border:1px solid var(--primary); color:var(--primary); text-decoration:none; border-radius:6px; font-weight:500; transition:all 0.2s; display:flex; align-items:center; gap:0.5rem; }
+        .nav-btn:hover { background:rgba(67,97,238,0.05); }
+        .nav-btn.next { background:var(--primary); color:white; border-color:var(--primary); display:none; }
+        .nav-btn.next:hover { background:var(--secondary); }
+
+        .feedback-msg { margin-top:1rem; font-weight:600; text-align:center; display:none; }
+        .feedback-msg.success { color:var(--success); display:block; }
+        .feedback-msg.error { color:var(--danger); display:block; }
+
+        @media(max-width:800px) {
+            body { flex-direction:column; }
+            .sidebar { width:100%; height:auto; max-height:250px; border-right:none; border-bottom:1px solid rgba(0,0,0,0.1); }
+            .main-wrapper { height:auto; }
+            .content-container { padding:2rem 1.5rem 4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="branding">
+            <a href="home.html">Edu<span>Free</span>Hub</a>
+        </div>
+        <a href="#" id="backToCourse" class="back-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to Course Dashboard
+        </a>
+    </div>
+
+    <aside class="sidebar">
+        <div class="course-title-sidebar" id="sidebarCourseTitle">Loading Course...</div>
+        <div id="tocContainer"></div>
+    </aside>
+
+    <main class="main-wrapper" id="mainScroll">
+        <div class="content-container">
+            <div class="lesson-header">
+                <div class="module-label" id="moduleLabel">MODULE 1</div>
+                <h1 class="lesson-title" id="lessonTitle">Loading Lesson...</h1>
+            </div>
+
+            <!-- Video Embed -->
+            <div id="videoSection" style="display:none; margin-bottom:2rem;">
+                <div class="video-container">
+                    <iframe id="lessonVideo" width="100%" height="100%" src="" title="Video Lecture" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:8px;"></iframe>
+                </div>
+                <div style="background:var(--light); padding:1rem 1.5rem; border-radius:8px; border:1px solid rgba(0,0,0,0.05); margin-top:-1rem; border-top-left-radius:0; border-top-right-radius:0;">
+                    <h4 style="color:var(--dark); font-size:1rem; margin-bottom:0.3rem;" id="videoDescTitle">Topic Description</h4>
+                    <p style="color:var(--text); opacity:0.8; font-size:0.9rem;" id="videoDescText">Loading summary...</p>
+                </div>
+            </div>
+
+            <div class="lesson-body" id="lessonBody">
+                <p>Loading course content...</p>
+            </div>
+
+            <div class="quiz-section" id="quizSection">
+                <h2 class="quiz-title">Knowledge Check</h2>
+                <p class="quiz-subtitle">Pass this quick assignment to complete the topic and move forward.</p>
+                <div id="quizContainer"></div>
+                <button class="submit-btn" id="submitQuizBtn" onclick="window.__submitQuiz()">Submit Assignment</button>
+                <div class="feedback-msg" id="quizFeedback"></div>
+            </div>
+
+            <div class="lesson-nav">
+                <a href="#" class="nav-btn" id="prevBtn">&larr; Previous</a>
+                <a href="#" class="nav-btn next" id="nextBtn">Next Lesson &rarr;</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Load data in order -->
+    <script src="course-data.js"></script>
+    <script src="lesson-data.js"></script>
+    <script src="lesson-app.js"></script>
+</body>
+</html>

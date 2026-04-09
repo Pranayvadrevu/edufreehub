@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic - EduFreeHub | Free Academic & Science Courses</title>
+    <meta name="description" content="Access university-level courses in mathematics, physics, chemistry, biology, and more from the world's top institutions — completely free.">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --danger: #ef476f;
+            --dark: #1b263b;
+            --light: #f8f9fa;
+            --text: #2b2d42;
+            --bg: #ffffff;
+            --card-bg: #ffffff;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --header-height: 80px;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        @font-face {
+            font-family: 'Poppins';
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/poppins-font/1.0.1/poppins-regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Poppins';
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/poppins-font/1.0.1/poppins-bold.ttf') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.2s ease;
+        }
+
+        .cursor-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            mix-blend-mode: difference;
+        }
+
+        a, button, .clickable {
+            cursor: none;
+        }
+
+        a:hover ~ .cursor, button:hover ~ .cursor, .clickable:hover ~ .cursor {
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transition: var(--transition);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        header.scrolled {
+            height: 60px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--gradient);
+            transition: width 0.3s ease;
+        }
+
+        .logo:hover::after {
+            width: 100%;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu {
+            display: flex;
+            list-style: none;
+        }
+
+        .menu-item {
+            position: relative;
+            margin: 0 0.8rem;
+        }
+
+        .menu-link {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+
+        .menu-link:hover {
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .menu-link.active {
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 230px;
+            background: white;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            padding: 1rem 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: var(--transition);
+            z-index: 10;
+        }
+
+        .menu-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(10px);
+        }
+
+        .dropdown-item {
+            list-style: none;
+        }
+
+        .dropdown-link {
+            display: block;
+            color: var(--text);
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            transition: var(--transition);
+        }
+
+        .dropdown-link:hover {
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: var(--gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            z-index: -1;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn:hover::before {
+            opacity: 1;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            margin-left: 1rem;
+        }
+
+        .btn-outline:hover {
+            color: white;
+            background: var(--gradient);
+            border-color: transparent;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark);
+            cursor: pointer;
+            z-index: 150;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        main {
+            margin-top: var(--header-height);
+            min-height: calc(100vh - var(--header-height));
+            position: relative;
+        }
+
+        .hero {
+            height: calc(100vh - var(--header-height));
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            width: 50%;
+            animation: fadeInLeft 1s ease;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-text {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: var(--text);
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .hero-image {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 45%;
+            animation: floatImage 4s ease-in-out infinite;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .scroll-down {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text);
+            font-size: 0.9rem;
+            opacity: 0.7;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .scroll-down:hover {
+            opacity: 1;
+            transform: translate(-50%, -5px);
+        }
+
+        .scroll-down svg {
+            width: 30px;
+            height: 30px;
+            margin-top: 0.5rem;
+            animation: bounceArrow 2s infinite;
+        }
+
+        @keyframes bounceArrow {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes floatImage {
+            0%, 100% {
+                transform: translateY(calc(-50% + 0px));
+            }
+            50% {
+                transform: translateY(calc(-50% - 15px));
+            }
+        }
+
+        section {
+            padding: 6rem 0;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        .section-title p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+            color: var(--text);
+            opacity: 0.8;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: var(--gradient);
+            margin: 1.5rem auto 0;
+            border-radius: 2px;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .category-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient);
+            transition: var(--transition);
+        }
+
+        .category-card:hover::before {
+            height: 10px;
+        }
+
+        .category-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem auto 1rem;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .category-content {
+            padding: 1.5rem 2rem 2rem;
+            text-align: center;
+        }
+
+        .category-content h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .category-content p {
+            color: var(--text);
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+            min-height: 80px;
+        }
+
+        .featured-resources {
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('/api/placeholder/1920/1080');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .resource-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .resource-image {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .resource-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .resource-card:hover .resource-image img {
+            transform: scale(1.1);
+        }
+
+        .resource-tag {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.4rem 0.8rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .resource-content {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .resource-category {
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .resource-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+            line-height: 1.4;
+        }
+
+        .resource-description {
+            color: var(--text);
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 1rem;
+        }
+
+        .resource-provider {
+            display: flex;
+            align-items: center;
+        }
+
+        .resource-provider img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 0.8rem;
+        }
+
+        .resource-provider span {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .resource-rating {
+            display: flex;
+            align-items: center;
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .resource-rating svg {
+            margin-right: 0.5rem;
+        }
+
+        .how-it-works {
+            overflow: hidden;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            text-align: center;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            background: var(--card-bg);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -1.5rem;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 20px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234361ee'%3E%3Cpath d='M17.92 11.62a1 1 0 0 0-.21-.33l-5-5a1 1 0 0 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            z-index: 1;
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .step h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .step p {
+            color: var(--text);
+            opacity: 0.8;
+        }
+
+        .cta-section {
+            background: var(--gradient);
+            color: white;
+            border-radius: var(--border-radius);
+            padding: 4rem;
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.2;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-content p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1.2rem 2rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            box-shadow: 0 5px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            height: calc(100% - 10px);
+            padding: 0 1.5rem;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover {
+            transform: translateX(3px);
+        }
+
+        .trending {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .trending-tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            backdrop-filter: blur(5px);
+        }
+
+        .trending-tag:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .counters {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .counter {
+            text-align: center;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+
+        .counter:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .counter-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(67, 97, 238, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .counter-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .counter-text {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .testimonials {
+            overflow: hidden;
+        }
+
+        .testimonial-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .testimonial {
+            text-align: center;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .testimonial::before {
+            content: '"';
+            position: absolute;
+            top: 0;
+            left: 2rem;
+            font-size: 5rem;
+            color: rgba(67, 97, 238, 0.1);
+            font-family: 'Georgia', serif;
+            line-height: 1;
+        }
+
+        .testimonial-text {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 2rem;
+            color: var(--text);
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 1rem;
+        }
+
+        .testimonial-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .testimonial-info {
+            text-align: left;
+        }
+
+        .testimonial-name {
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 0.2rem;
+        }
+
+        .testimonial-role {
+            font-size: 0.9rem;
+            color: var(--text);
+            opacity: 0.8;
+        }
+
+        .testimonial-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .testimonial-control {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .testimonial-control:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.2);
+        }
+
+        .newsletter {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(76, 201, 240, 0.05));
+            border-radius: var(--border-radius);
+            padding: 4rem;
+            text-align: center;
+        }
+
+        .newsletter-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .newsletter-text {
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            color: var(--text);
+            opacity: 0.8;
+        }
+
+        .newsletter-form {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .newsletter-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .newsletter-input:focus {
+            box-shadow: 0 5px 20px rgba(67, 97, 238, 0.2);
+        }
+
+        .newsletter-btn {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            height: calc(100% - 10px);
+            padding: 0 1.5rem;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .newsletter-btn:hover {
+            transform: translateX(3px);
+        }
+
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 5rem 0 0;
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-widget h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-widget h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--accent);
+        }
+
+        .footer-about p {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+            line-height: 1.7;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .social-link {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: white;
+            opacity: 0.8;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            transform: translateX(5px);
+            color: var(--accent);
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .footer-contact-icon {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .footer-contact-text {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .footer-bottom {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem 0;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .footer-bottom p {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 99;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+        }
+
+        @media (max-width: 1200px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero {
+                height: auto;
+                padding: 5rem 0;
+            }
+
+            .hero-content {
+                width: 100%;
+                text-align: center;
+                margin-bottom: 3rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-image {
+                position: relative;
+                width: 80%;
+                top: auto;
+                right: auto;
+                transform: none;
+                margin: 0 auto;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .step::after {
+                display: none;
+            }
+
+            .counters {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0 1rem;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 80%;
+                height: 100vh;
+                background: white;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 5rem 2rem 2rem;
+                transition: var(--transition);
+                z-index: 100;
+                box-shadow: -5px 0 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .menu.active {
+                right: 0;
+            }
+
+            .menu-item {
+                margin: 0.5rem 0;
+                width: 100%;
+            }
+
+            .menu-link {
+                display: block;
+                padding: 0.8rem 0;
+            }
+
+            .dropdown {
+                position: static;
+                width: 100%;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                box-shadow: none;
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+            }
+
+            .menu-item.active .dropdown {
+                max-height: 500px;
+            }
+
+            .dropdown-link {
+                padding: 0.8rem 1rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .btn-outline {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+
+            .cta-section {
+                padding: 3rem 1.5rem;
+            }
+
+            .section {
+                padding: 4rem 0;
+            }
+
+            .section-title h2 {
+                font-size: 2rem;
+            }
+
+            .counters {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 1.5rem;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .categories,
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-content h2 {
+                font-size: 1.8rem;
+            }
+
+            .search-btn {
+                position: static;
+                width: 100%;
+                margin-top: 1rem;
+                height: auto;
+                padding: 0.8rem;
+            }
+
+            .search-input {
+                padding: 1rem;
+            }
+
+            .newsletter {
+                padding: 2rem 1.5rem;
+            }
+
+            .newsletter-btn {
+                position: static;
+                width: 100%;
+                margin-top: 1rem;
+                height: auto;
+                padding: 0.8rem;
+            }
+
+            .newsletter-input {
+                padding: 0.8rem 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cursor"></div>
+    <div class="cursor-dot"></div>
+    <script>const cursor=document.querySelector('.cursor');const cursorDot=document.querySelector('.cursor-dot');document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';cursorDot.style.left=e.clientX+'px';cursorDot.style.top=e.clientY+'px';});</script>
+
+    <div id="canvas-container"></div>
+
+    <header>
+        <div class="header-container container">
+            <a href="home.html" class="logo">Edu<span>Free</span>Hub</a>
+            <nav>
+                <ul class="menu">
+                    <li class="menu-item">
+                        <a href="home.html" class="menu-link">Home</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link active">Categories</a>
+                        <ul class="dropdown">
+                            <li class="dropdown-item"><a href="programming.html" class="dropdown-link">Programming</a></li>
+                            <li class="dropdown-item"><a href="data-science.html" class="dropdown-link">Data Science</a></li>
+                            <li class="dropdown-item"><a href="design.html" class="dropdown-link">Design</a></li>
+                            <li class="dropdown-item"><a href="business.html" class="dropdown-link">Business</a></li>
+                            <li class="dropdown-item"><a href="language-learning.html" class="dropdown-link">Language Learning</a></li>
+                            <li class="dropdown-item"><a href="academic.html" class="dropdown-link">Academic</a></li>
+                            <li class="dropdown-item"><a href="personal-development.html" class="dropdown-link">Personal Development</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item">
+                        <a href="home.html#featured-resources" class="menu-link">Resources</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="home.html" class="menu-link">About</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="home.html" class="menu-link">Contact</a>
+                    </li>
+                </ul>
+            </nav>
+            <button class="mobile-menu-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Category Hero -->
+        <section class="hero" style="min-height:auto;height:auto;padding:6rem 0 3rem;">
+            <div class="container" style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+                <a href="home.html" style="display:inline-flex;align-items:center;gap:0.5rem;color:var(--primary);text-decoration:none;font-weight:500;margin-bottom:1.5rem;transition:var(--transition);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                    Back to Home
+                </a>
+                <h1 class="hero-title" style="font-size:3rem;margin-bottom:1rem;">Academic & Science</h1>
+                <p class="hero-text" style="max-width:700px;margin:0 auto 2rem;">Explore the frontiers of science and academic knowledge</p>
+                <p style="max-width:800px;margin:0 auto 2.5rem;color:var(--text);opacity:0.8;font-size:1rem;line-height:1.7;">Access university-level courses in mathematics, physics, chemistry, biology, and more from the world's top institutions — completely free.</p>
+                <div class="search-container" style="max-width:550px;margin:0 auto;">
+                    <input type="text" class="search-input" placeholder="Search academic courses..." id="courseSearch">
+                    <button class="search-btn" onclick="filterCourses()">Search</button>
+                </div>
+                <div style="display:flex;gap:1rem;margin-top:1.5rem;flex-wrap:wrap;justify-content:center;">
+                    <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.5rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:500;cursor:pointer;transition:var(--transition);" class="filter-tag">Calculus</span>
+                    <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.5rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:500;cursor:pointer;transition:var(--transition);" class="filter-tag">Mechanics</span>
+                    <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.5rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:500;cursor:pointer;transition:var(--transition);" class="filter-tag">Chemistry</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Bar -->
+        <section style="padding:2rem 0;background:linear-gradient(135deg,rgba(67,97,238,0.03),rgba(76,201,240,0.03));">
+            <div class="container">
+                <div style="display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;">
+                    <div style="text-align:center;"><span style="font-size:1.8rem;font-weight:bold;color:var(--primary);">6</span><br><span style="font-size:0.85rem;color:var(--text);opacity:0.7;">Free Courses</span></div>
+                    <div style="text-align:center;"><span style="font-size:1.8rem;font-weight:bold;color:var(--primary);">10K+</span><br><span style="font-size:0.85rem;color:var(--text);opacity:0.7;">Active Learners</span></div>
+                    <div style="text-align:center;"><span style="font-size:1.8rem;font-weight:bold;color:var(--primary);">4.8</span><br><span style="font-size:0.85rem;color:var(--text);opacity:0.7;">Avg. Rating</span></div>
+                    <div style="text-align:center;"><span style="font-size:1.8rem;font-weight:bold;color:var(--primary);">320+</span><br><span style="font-size:0.85rem;color:var(--text);opacity:0.7;">Hours of Content</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Courses Grid -->
+        <section id="courses" style="padding:4rem 0;">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Available Courses</h2>
+                    <p>Explore our handpicked selection of free academic resources</p>
+                </div>
+                <div class="resources-grid" id="coursesGrid">
+                    <div class="resource-card" style="cursor:pointer;" onclick="var a=this.querySelector('.resource-title a');if(a)window.location.href=a.href">
+                        <div class="resource-image">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(67,97,238,0.15),rgba(76,201,240,0.15));display:flex;align-items:center;justify-content:center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(67,97,238,0.4)" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 016.5 2H20v20H6.5a2.5 2.5 0 01-2.5-2.5z"/><path d="M8 7h8M8 11h6M8 15h4"/></svg>
+                            </div>
+                            <div class="resource-tag">Featured</div>
+                        </div>
+                        <div class="resource-content">
+                            <div class="resource-category">Undergraduate &bull; 80 hours</div>
+                            <h3 class="resource-title"><a href="course.html?id=calculus" style="color:inherit;text-decoration:none;">Calculus I & II Complete Course</a></h3>
+                            <p class="resource-description">Master limits, derivatives, integrals, series, and multivariable calculus with step-by-step video lessons, practice problems, and exams.</p>
+                            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Calculus</span>
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Derivatives</span>
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Integrals</span>
+                            </div>
+                            <div class="resource-meta">
+                                <div class="resource-provider">
+                                    <div style="width:30px;height:30px;border-radius:50%;background:var(--gradient);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.8rem;margin-right:0.8rem;">M</div>
+                                    <span>MIT OpenCourseWare</span>
+                                </div>
+                                <div class="resource-rating">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#ffd166" stroke="#ffd166" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    4.9
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="resource-card" style="cursor:pointer;" onclick="var a=this.querySelector('.resource-title a');if(a)window.location.href=a.href">
+                        <div class="resource-image">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(67,97,238,0.15),rgba(76,201,240,0.15));display:flex;align-items:center;justify-content:center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(67,97,238,0.4)" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 016.5 2H20v20H6.5a2.5 2.5 0 01-2.5-2.5z"/><path d="M8 7h8M8 11h6M8 15h4"/></svg>
+                            </div>
+                            <div class="resource-tag">Popular</div>
+                        </div>
+                        <div class="resource-content">
+                            <div class="resource-category">High School / College &bull; 60 hours</div>
+                            <h3 class="resource-title"><a href="course.html?id=intro-physics" style="color:inherit;text-decoration:none;">Introduction to Physics</a></h3>
+                            <p class="resource-description">Explore classical mechanics, thermodynamics, electromagnetism, and modern physics concepts through interactive simulations and experiments.</p>
+                            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Mechanics</span>
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Waves</span>
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Energy</span>
+                            </div>
+                            <div class="resource-meta">
+                                <div class="resource-provider">
+                                    <div style="width:30px;height:30px;border-radius:50%;background:var(--gradient);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.8rem;margin-right:0.8rem;">K</div>
+                                    <span>Khan Academy</span>
+                                </div>
+                                <div class="resource-rating">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#ffd166" stroke="#ffd166" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    4.8
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="resource-card" style="cursor:pointer;" onclick="var a=this.querySelector('.resource-title a');if(a)window.location.href=a.href">
+                        <div class="resource-image">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(67,97,238,0.15),rgba(76,201,240,0.15));display:flex;align-items:center;justify-content:center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(67,97,238,0.4)" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 016.5 2H20v20H6.5a2.5 2.5 0 01-2.5-2.5z"/><path d="M8 7h8M8 11h6M8 15h4"/></svg>
+                            </div>
+                            <div class="resource-tag">Essential</div>
+                        </div>
+                        <div class="resource-content">
+                            <div class="resource-category">Undergraduate &bull; 50 hours</div>
+                            <h3 class="resource-title"><a href="course.html?id=organic-chemistry" style="color:inherit;text-decoration:none;">Organic Chemistry Fundamentals</a></h3>
+                            <p class="resource-description">Learn molecular structures, reaction mechanisms, stereochemistry, spectroscopy, and synthesis strategies for organic compounds.</p>
+                            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Chemistry</span>
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Reactions</span>
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Molecules</span>
+                            </div>
+                            <div class="resource-meta">
+                                <div class="resource-provider">
+                                    <div style="width:30px;height:30px;border-radius:50%;background:var(--gradient);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.8rem;margin-right:0.8rem;">Y</div>
+                                    <span>Yale Open Courses</span>
+                                </div>
+                                <div class="resource-rating">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#ffd166" stroke="#ffd166" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    4.7
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="resource-card" style="cursor:pointer;" onclick="var a=this.querySelector('.resource-title a');if(a)window.location.href=a.href">
+                        <div class="resource-image">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(67,97,238,0.15),rgba(76,201,240,0.15));display:flex;align-items:center;justify-content:center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(67,97,238,0.4)" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 016.5 2H20v20H6.5a2.5 2.5 0 01-2.5-2.5z"/><path d="M8 7h8M8 11h6M8 15h4"/></svg>
+                            </div>
+                            <div class="resource-tag">Free</div>
+                        </div>
+                        <div class="resource-content">
+                            <div class="resource-category">High School / College &bull; 55 hours</div>
+                            <h3 class="resource-title"><a href="course.html?id=biology" style="color:inherit;text-decoration:none;">Biology: From Cells to Ecosystems</a></h3>
+                            <p class="resource-description">Comprehensive biology course covering cell biology, genetics, evolution, ecology, human anatomy, and molecular biology techniques.</p>
+                            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Biology</span>
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Genetics</span>
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Ecology</span>
+                            </div>
+                            <div class="resource-meta">
+                                <div class="resource-provider">
+                                    <div style="width:30px;height:30px;border-radius:50%;background:var(--gradient);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.8rem;margin-right:0.8rem;">C</div>
+                                    <span>CK-12 Foundation</span>
+                                </div>
+                                <div class="resource-rating">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#ffd166" stroke="#ffd166" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    4.6
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="resource-card" style="cursor:pointer;" onclick="var a=this.querySelector('.resource-title a');if(a)window.location.href=a.href">
+                        <div class="resource-image">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(67,97,238,0.15),rgba(76,201,240,0.15));display:flex;align-items:center;justify-content:center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(67,97,238,0.4)" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 016.5 2H20v20H6.5a2.5 2.5 0 01-2.5-2.5z"/><path d="M8 7h8M8 11h6M8 15h4"/></svg>
+                            </div>
+                            <div class="resource-tag">Top Rated</div>
+                        </div>
+                        <div class="resource-content">
+                            <div class="resource-category">Undergraduate &bull; 35 hours</div>
+                            <h3 class="resource-title"><a href="course.html?id=linear-algebra" style="color:inherit;text-decoration:none;">Linear Algebra & Applications</a></h3>
+                            <p class="resource-description">Understand vectors, matrices, eigenvalues, linear transformations, and their applications in data science, graphics, and engineering.</p>
+                            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Matrices</span>
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Vectors</span>
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Transforms</span>
+                            </div>
+                            <div class="resource-meta">
+                                <div class="resource-provider">
+                                    <div style="width:30px;height:30px;border-radius:50%;background:var(--gradient);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.8rem;margin-right:0.8rem;">3</div>
+                                    <span>3Blue1Brown</span>
+                                </div>
+                                <div class="resource-rating">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#ffd166" stroke="#ffd166" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    4.9
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="resource-card" style="cursor:pointer;" onclick="var a=this.querySelector('.resource-title a');if(a)window.location.href=a.href">
+                        <div class="resource-image">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(67,97,238,0.15),rgba(76,201,240,0.15));display:flex;align-items:center;justify-content:center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(67,97,238,0.4)" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 016.5 2H20v20H6.5a2.5 2.5 0 01-2.5-2.5z"/><path d="M8 7h8M8 11h6M8 15h4"/></svg>
+                            </div>
+                            <div class="resource-tag">Popular</div>
+                        </div>
+                        <div class="resource-content">
+                            <div class="resource-category">All Levels &bull; 40 hours</div>
+                            <h3 class="resource-title"><a href="course.html?id=world-history" style="color:inherit;text-decoration:none;">World History: Civilizations</a></h3>
+                            <p class="resource-description">Journey through human history from ancient civilizations to modern geopolitics, covering key events, cultural movements, and their lasting impact.</p>
+                            <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">History</span>
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Civilizations</span>
+                                <span style="background:rgba(67,97,238,0.08);color:var(--primary);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;font-weight:500;">Culture</span>
+                            </div>
+                            <div class="resource-meta">
+                                <div class="resource-provider">
+                                    <div style="width:30px;height:30px;border-radius:50%;background:var(--gradient);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:0.8rem;margin-right:0.8rem;">C</div>
+                                    <span>Crash Course</span>
+                                </div>
+                                <div class="resource-rating">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#ffd166" stroke="#ffd166" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    4.8
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Explore Other Categories -->
+        <section style="padding:4rem 0;background:linear-gradient(135deg,rgba(67,97,238,0.03),rgba(76,201,240,0.03));">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Explore Other Categories</h2>
+                    <p>Discover more free learning resources across different fields</p>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.5rem;">
+                    <a href="programming.html" style="text-decoration:none;display:block;background:var(--card-bg);border-radius:var(--border-radius);padding:2rem;box-shadow:var(--box-shadow);transition:var(--transition);text-align:center;position:relative;overflow:hidden;" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 15px 30px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='none';this.style.boxShadow='var(--box-shadow)'">
+                        <div style="width:50px;height:50px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:white;font-size:1.2rem;font-weight:bold;">P</div>
+                        <h3 style="color:var(--dark);font-size:1.1rem;margin-bottom:0.5rem;">Programming & Development</h3>
+                        <p style="color:var(--text);opacity:0.7;font-size:0.85rem;">6 Free Courses</p>
+                    </a>
+                    <a href="data-science.html" style="text-decoration:none;display:block;background:var(--card-bg);border-radius:var(--border-radius);padding:2rem;box-shadow:var(--box-shadow);transition:var(--transition);text-align:center;position:relative;overflow:hidden;" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 15px 30px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='none';this.style.boxShadow='var(--box-shadow)'">
+                        <div style="width:50px;height:50px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:white;font-size:1.2rem;font-weight:bold;">D</div>
+                        <h3 style="color:var(--dark);font-size:1.1rem;margin-bottom:0.5rem;">Data Science & AI</h3>
+                        <p style="color:var(--text);opacity:0.7;font-size:0.85rem;">6 Free Courses</p>
+                    </a>
+                    <a href="design.html" style="text-decoration:none;display:block;background:var(--card-bg);border-radius:var(--border-radius);padding:2rem;box-shadow:var(--box-shadow);transition:var(--transition);text-align:center;position:relative;overflow:hidden;" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 15px 30px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='none';this.style.boxShadow='var(--box-shadow)'">
+                        <div style="width:50px;height:50px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:white;font-size:1.2rem;font-weight:bold;">D</div>
+                        <h3 style="color:var(--dark);font-size:1.1rem;margin-bottom:0.5rem;">Design & Creativity</h3>
+                        <p style="color:var(--text);opacity:0.7;font-size:0.85rem;">6 Free Courses</p>
+                    </a>
+                    <a href="business.html" style="text-decoration:none;display:block;background:var(--card-bg);border-radius:var(--border-radius);padding:2rem;box-shadow:var(--box-shadow);transition:var(--transition);text-align:center;position:relative;overflow:hidden;" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 15px 30px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='none';this.style.boxShadow='var(--box-shadow)'">
+                        <div style="width:50px;height:50px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:white;font-size:1.2rem;font-weight:bold;">B</div>
+                        <h3 style="color:var(--dark);font-size:1.1rem;margin-bottom:0.5rem;">Business & Entrepreneurship</h3>
+                        <p style="color:var(--text);opacity:0.7;font-size:0.85rem;">6 Free Courses</p>
+                    </a>
+                    <a href="language-learning.html" style="text-decoration:none;display:block;background:var(--card-bg);border-radius:var(--border-radius);padding:2rem;box-shadow:var(--box-shadow);transition:var(--transition);text-align:center;position:relative;overflow:hidden;" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 15px 30px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='none';this.style.boxShadow='var(--box-shadow)'">
+                        <div style="width:50px;height:50px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:white;font-size:1.2rem;font-weight:bold;">L</div>
+                        <h3 style="color:var(--dark);font-size:1.1rem;margin-bottom:0.5rem;">Languages & Communication</h3>
+                        <p style="color:var(--text);opacity:0.7;font-size:0.85rem;">6 Free Courses</p>
+                    </a>
+                    <a href="personal-development.html" style="text-decoration:none;display:block;background:var(--card-bg);border-radius:var(--border-radius);padding:2rem;box-shadow:var(--box-shadow);transition:var(--transition);text-align:center;position:relative;overflow:hidden;" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 15px 30px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='none';this.style.boxShadow='var(--box-shadow)'">
+                        <div style="width:50px;height:50px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:white;font-size:1.2rem;font-weight:bold;">P</div>
+                        <h3 style="color:var(--dark);font-size:1.1rem;margin-bottom:0.5rem;">Personal Development</h3>
+                        <p style="color:var(--text);opacity:0.7;font-size:0.85rem;">6 Free Courses</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter CTA -->
+        <section id="newsletter" class="container" style="padding:4rem 0;">
+            <div class="newsletter">
+                <h2 class="newsletter-title">Get New Academic Resources Weekly</h2>
+                <p class="newsletter-text">Subscribe to receive weekly updates on new academic courses, tutorials, and learning tips delivered to your inbox.</p>
+                <form class="newsletter-form" onsubmit="event.preventDefault();alert('Thank you for subscribing!')">
+                    <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
+                    <button type="submit" class="newsletter-btn">Subscribe</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-widget footer-about">
+                    <h3>About EduFreeHub</h3>
+                    <p>EduFreeHub is a platform dedicated to making education accessible to everyone by curating the best free educational resources from around the web.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
+                        <a href="#" class="social-link"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg></a>
+                        <a href="#" class="social-link"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+                        <a href="#" class="social-link"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><circle cx="17.5" cy="6.5" r="1.5"/></svg></a>
+                    </div>
+                </div>
+                <div class="footer-widget footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="home.html">Home</a></li>
+                        <li><a href="home.html">About Us</a></li>
+                        <li><a href="home.html#categories">Categories</a></li>
+                        <li><a href="home.html#featured-resources">Resources</a></li>
+                        <li><a href="home.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-widget footer-links">
+                    <h3>Categories</h3>
+                    <ul>
+                        <li><a href="programming.html">Programming</a></li>
+                        <li><a href="data-science.html">Data Science</a></li>
+                        <li><a href="design.html">Design</a></li>
+                        <li><a href="business.html">Business</a></li>
+                        <li><a href="language-learning.html">Language Learning</a></li>
+                        <li><a href="academic.html">Academic</a></li>
+                        <li><a href="personal-development.html">Personal Development</a></li>
+                    </ul>
+                </div>
+                <div class="footer-widget footer-contact">
+                    <h3>Contact Us</h3>
+                    <div class="footer-contact-item"><div class="footer-contact-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="footer-contact-text">123 Education Street, Learning City, LC 12345</div></div>
+                    <div class="footer-contact-item"><div class="footer-contact-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></div><div class="footer-contact-text">+1 (123) 456-7890</div></div>
+                    <div class="footer-contact-item"><div class="footer-contact-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="footer-contact-text">info@edufreehub.com</div></div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 EduFreeHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="back-to-top"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const menu = document.querySelector('.menu');
+        mobileMenuBtn.addEventListener('click', () => { menu.classList.toggle('active'); });
+
+        // Dropdown menu for mobile
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() { if (window.innerWidth <= 768) { this.classList.toggle('active'); } });
+        });
+
+        // Back to top button
+        const backToTopBtn = document.querySelector('.back-to-top');
+        window.addEventListener('scroll', () => { backToTopBtn.classList.toggle('active', window.pageYOffset > 300); });
+        backToTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => { document.querySelector('header').classList.toggle('scrolled', window.scrollY > 50); });
+
+        // Course search filter
+        function filterCourses() {
+            const query = document.getElementById('courseSearch').value.toLowerCase();
+            document.querySelectorAll('.resource-card').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+        document.getElementById('courseSearch').addEventListener('keyup', filterCourses);
+
+        // Filter tags click
+        document.querySelectorAll('.filter-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                document.getElementById('courseSearch').value = this.textContent;
+                filterCourses();
+            });
+        });
+
+        // Canvas background
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const canvasContainer = document.getElementById('canvas-container');
+        canvasContainer.appendChild(canvas);
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+        const particles = [];
+        class Particle { constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 3 + 1; this.speedX = Math.random() * 1 - 0.5; this.speedY = Math.random() * 1 - 0.5; this.color = 'rgba(67, 97, 238, 0.3)'; } update() { this.x += this.speedX; this.y += this.speedY; if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX; if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY; } draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } }
+        for (let i = 0; i < 50; i++) particles.push(new Particle());
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); for (let j = i; j < particles.length; j++) { const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const dist = Math.sqrt(dx * dx + dy * dy); if (dist < 100) { ctx.beginPath(); ctx.strokeStyle = 'rgba(67, 97, 238, 0.1)'; ctx.lineWidth = 0.5; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke(); } } } requestAnimationFrame(animate); }
+        animate();
+    </script>
+</body>
+</html>
